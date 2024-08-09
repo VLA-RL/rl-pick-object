@@ -6,8 +6,10 @@ from rlbench.action_modes.arm_action_modes import JointVelocity
 from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.observation_config import ObservationConfig
 from rlbench.tasks.pick_described_object import PickDescribedObject
-from TD3Agent import TD3Agent, load_demos_to_buffer
+from TD3Agent import TD3Agent
 import os
+import glob
+import re
 
 # Hyperparameters
 state_dim = 7 + 3 + 7 + 7 + 1  # Adjust based on your state representation
@@ -67,16 +69,33 @@ agent = TD3Agent(
     policy_freq,
 )
 
-# Load demos into replay buffer
-demos_path = "./pick_described_object_demos/item_pos_demos.pt"
-load_demos_to_buffer(agent.replay_buffer, demos_path)
-
 # Create a directory for saving weights
 weights_dir = "./td3_weights"
 os.makedirs(weights_dir, exist_ok=True)
+existing_weights = glob.glob(
+    os.path.join(weights_dir, "td3_pick_described_object_*_actor")
+)
+if existing_weights:
+    # Sort weights by episode number
+    def extract_number(filename):
+        match = re.search(r"td3_pick_described_object_(\d+)_actor$", filename)
+        return int(match.group(1)) if match else 0
 
+    existing_weights.sort(key=extract_number)
+    latest_weights = existing_weights[-1]
+    latest_weights_base = latest_weights[:-6]  # Remove '_actor' from the end
+    print(f"Loading existing weights from {latest_weights_base}")
+    agent.load(latest_weights_base)
+    # Extract the starting episode number
+    start_episode = extract_number(latest_weights)
+else:
+    print("No existing weights found. Starting from scratch.")
+    # Load demos into replay buffer
+    start_episode = 0
+print(f"Start Episode: {start_episode}")
 # Training loop
-for episode in range(num_episodes):
+for episode in range(start_episode, num_episodes):
+    task.sample_variation()
     descriptions, obs = task.reset()
     state = np.concatenate(
         [

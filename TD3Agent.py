@@ -11,13 +11,13 @@ class Actor(nn.Module):
         super(Actor, self).__init__()
         self.net = nn.Sequential(
             nn.Linear(state_dim, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 256),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(256, action_dim),
         )
         self.max_action = max_action
@@ -31,22 +31,24 @@ class Critic(nn.Module):
         super(Critic, self).__init__()
         self.net1 = nn.Sequential(
             nn.Linear(state_dim + action_dim, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
+            nn.Linear(512, 512),
+            nn.LeakyReLU(),
             nn.Linear(512, 256),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(256, 1),
         )
         self.net2 = nn.Sequential(
             nn.Linear(state_dim + action_dim, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 256),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(256, 1),
         )
 

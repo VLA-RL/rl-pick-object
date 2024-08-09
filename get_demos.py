@@ -25,7 +25,6 @@ class DemoCollector:
         object_grasped = (
             grasped_object and grasped_object[0] == self.task._task.target_object
         )
-
         state = np.concatenate(
             [
                 self.task._task.target_object.get_pose(),
@@ -63,20 +62,23 @@ class DemoCollector:
             reward = 0
             if not current_step["object_grasped"]:
                 distance_to_object = np.linalg.norm(
-                    current_step["gripper_position"] - current_step["object_position"]
+                    next_step["gripper_position"] - next_step["object_position"]
                 )
                 reward -= distance_to_object
             else:
                 distance_to_basket = np.linalg.norm(
-                    current_step["object_position"] - current_step["basket_position"]
+                    next_step["object_position"] - next_step["basket_position"]
                 )
                 reward += 2 - distance_to_basket
 
-            done = i == len(self.demo_steps) - 1
-            if done:
-                reward = 500
+            processed_demo.append((state, action, next_state, reward, False))
 
-            processed_demo.append((state, action, next_state, reward, done))
+        final_step = self.demo_steps[-1]
+        state = final_step["state"]
+        action = final_step["action"]
+        reward = 500
+        done = True
+        processed_demo.append((state, action, state, reward, done))
 
         self.demo_steps.clear()  # Clear the steps for the next demo
         return processed_demo
@@ -85,8 +87,8 @@ class DemoCollector:
 def collect_and_save_demos(task: TaskEnvironment, amount: int, save_path: str):
     collector = DemoCollector(task)
     processed_demos = []
-
     for _ in range(amount):
+        task.sample_variation()
         task.get_demos(1, live_demos=True, callable_each_step=collector.process_step)
         processed_demo = collector.process_demo()
         processed_demos.append(processed_demo)
