@@ -123,7 +123,7 @@ if __name__ == "__main__":
     save_dir = "./pick_described_object_demos"
     os.makedirs(save_dir, exist_ok=True)
     save_path = os.path.join(save_dir, "item_pos_demos.pt")
-    collect_and_save_demos(task, 6, save_path)
+    collect_and_save_demos(task, 1, save_path)
 
     # Load and verify the demos
     loaded_demos = load_demos(save_path)

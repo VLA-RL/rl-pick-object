@@ -1,7 +1,7 @@
 local lfs = require("lfs")
 
 local function run_python_script()
-    local handle, err = io.popen("python3 training_script_with_logs.py 2>&1")
+    local handle, err = io.popen("python3 adaptive_buffer_training_script_with_logs.py 2>&1")
     if not handle then
         print("Failed to run Python script: " .. (err or "unknown error"))
         return false, err, -1
@@ -16,11 +16,11 @@ local function run_python_script()
 
     local success, _, exit_code = handle:close()
     -- Check for specific errors in the output
-    if result:find("RuntimeError: ") then
+    if result:find("RuntimeError:") then
         print("Runtime error detected in output")
         return false, result, exit_code or -1
     end
-    if result:find("ValueError: ") then
+    if result:find("ValueError:") then
         print("ValueError detected in output")
         return false, result, exit_code or -1
     end

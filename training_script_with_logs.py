@@ -21,7 +21,7 @@ tau = 0.005
 policy_noise = 0.1
 noise_clip = 0.2
 policy_freq = 2
-batch_size = 1024
+batch_size = 256
 num_episodes = 10000
 max_steps = 200
 

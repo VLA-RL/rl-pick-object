@@ -96,6 +96,7 @@ for episode in range(start_episode, num_episodes):
         )
 
         next_obs, reward, done = task.step(action)
+        print(reward)
         next_state = np.concatenate(
             [
                 task._task.item.get_pose(),
